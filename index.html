@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="images/PISTUL.png" type="image/ico">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&display=swap" rel="stylesheet"> <!-- Poppins font -->
+    <title>1998 Loading...</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: black; /* Background color of the page */
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Load background texture
+        const textureLoader = new THREE.TextureLoader();
+        const spaceTexture = textureLoader.load('https://cdn.pixabay.com/photo/2017/01/18/21/28/galaxy-1999657_960_720.jpg');
+        scene.background = spaceTexture;
+
+        // Create canvas for the text on cube
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        canvas.width = 512;
+        canvas.height = 512;
+        context.fillStyle = 'black'; // Background color of the canvas
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.font = '150px Poppins'; // Using Poppins font
+        context.fillStyle = 'white'; // Text color
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        context.fillText('☣', canvas.width / 2, canvas.height / 2);
+
+        // Create texture from canvas
+        const texture = new THREE.CanvasTexture(canvas);
+
+        // Create a box geometry and apply the texture
+        const geometry = new THREE.BoxGeometry(10, 10, 10);
+        const material = new THREE.MeshStandardMaterial({
+            map: texture,
+            emissive: 0x5e17eb, // Change emissive color to #5e17eb
+            emissiveIntensity: 0.5, // Lower intensity for a softer glow
+            roughness: 0.2, // More reflective surface
+            metalness: 0.7 // More metallic surface
+        });
+        const cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
+
+        // Add lighting
+        const ambientLight = new THREE.AmbientLight(0x404040); // Soft white light
+        scene.add(ambientLight);
+
+        const pointLight = new THREE.PointLight(0xFFFFFF, 1, 100);
+        pointLight.position.set(20, 20, 20); // Adjusted position
+        scene.add(pointLight);
+
+        // Add a spotlight for more dramatic lighting
+        const spotlight = new THREE.SpotLight(0xFFFFFF, 1.2);
+        spotlight.position.set(30, 30, 30);
+        spotlight.castShadow = true;
+        scene.add(spotlight);
+
+        // Position the camera
+        camera.position.z = 50;
+
+        // Add particles
+        const particleCount = 1000;
+        const particles = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+        const colors = new Float32Array(particleCount * 3);
+
+        for (let i = 0; i < particleCount; i++) {
+            positions[i * 3] = Math.random() * 2000 - 1000;
+            positions[i * 3 + 1] = Math.random() * 2000 - 1000;
+            positions[i * 3 + 2] = Math.random() * 2000 - 1000;
+
+            colors[i * 3] = Math.random();
+            colors[i * 3 + 1] = Math.random();
+            colors[i * 3 + 2] = Math.random();
+        }
+
+        particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        particles.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        const particleMaterial = new THREE.PointsMaterial({
+            size: 5, // Increase size of particles
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.8, // Less transparent for better visibility
+            sizeAttenuation: true // Size decreases with distance from the camera
+        });
+        const particleSystem = new THREE.Points(particles, particleMaterial);
+        scene.add(particleSystem);
+
+        // Create loading text
+        const loadingCanvas = document.createElement('canvas');
+        const loadingContext = loadingCanvas.getContext('2d');
+        loadingCanvas.width = 1024;
+        loadingCanvas.height = 256;
+        loadingContext.fillStyle = 'black';
+        loadingContext.fillRect(0, 0, loadingCanvas.width, loadingCanvas.height);
+        loadingContext.font = '50px Poppins'; // Changed to Poppins font
+        loadingContext.fillStyle = 'rgba(255, 255, 255, 1)'; // Glowing effect with white color
+        loadingContext.textAlign = 'center';
+        loadingContext.textBaseline = 'middle';
+        loadingContext.shadowColor = 'rgba(255, 255, 255, 0.8)';
+        loadingContext.shadowBlur = 20; // Glowing effect
+        loadingContext.fillText('LOADING_', loadingCanvas.width / 2, loadingCanvas.height / 2);
+
+        const loadingTexture = new THREE.CanvasTexture(loadingCanvas);
+        const loadingMaterial = new THREE.MeshBasicMaterial({ map: loadingTexture, transparent: true });
+        const loadingGeometry = new THREE.PlaneGeometry(30, 7.5);
+        const loadingMesh = new THREE.Mesh(loadingGeometry, loadingMaterial);
+        loadingMesh.position.y = -12; // Adjusted position to move the text up
+        scene.add(loadingMesh);
+
+        // Animation
+        let glitchEffect = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Rotate the cube
+            cube.rotation.x += 0.01;
+            cube.rotation.y += 0.01;
+
+            // Rotate the background (simulating a rotating space background)
+            scene.background.rotation += 0.0005; // Slow rotation for background
+
+            // Update particles
+            particleSystem.rotation.y += 0.01;
+
+            // Terminal-style cursor blink effect with glitch animation
+            const currentTime = Date.now() * 0.005;
+            loadingContext.clearRect(0, 0, loadingCanvas.width, loadingCanvas.height);
+            loadingContext.fillStyle = 'black';
+            loadingContext.fillRect(0, 0, loadingCanvas.width, loadingCanvas.height);
+            loadingContext.fillStyle = 'rgba(255, 255, 255, 1)'; // Glowing effect with white color
+            loadingContext.shadowColor = 'rgba(255, 255, 255, 0.8)';
+            loadingContext.shadowBlur = 20; // Glowing effect
+            
+            if (Math.random() > 0.9) { // Random glitch
+                glitchEffect = Math.random() * 20 - 10;
+            } else {
+                glitchEffect *= 0.9; // Slowly fade out glitch
+            }
+
+            loadingContext.fillText('LOADING' + (Math.floor(currentTime) % 2 ? '_' : ' '), loadingCanvas.width / 2 + glitchEffect, loadingCanvas.height / 2);
+            loadingTexture.needsUpdate = true;
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Redirect after 5 seconds
+        setTimeout(function() {
+            window.location.href = 'index1.html';
+        }, 10000);
+
+        window.addEventListener('resize', function () {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        });
+    </script>
+</body>
+</html>

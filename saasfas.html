@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>1998 Loading...</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"> <!-- Mengimpor font Poppins -->
+    <link rel="icon" href="images/PISTUL.png" type="png/ico">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: black; /* Tetap mempertahankan latar belakang hitam */
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+
+        .loader {
+            perspective: 800px;
+            position: relative;
+        }
+
+        .cube {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: rotate 2s infinite linear;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5); /* Efek glow kubus */
+        }
+
+        .cube::before, .cube::after, .cube div {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: rgba(0, 255, 255, 0.3); /* Mengubah warna latar belakang kubus */
+            border: 1px solid rgba(0, 255, 255, 0.6); /* Mengubah warna border kubus */
+            border-radius: 10px;
+            backdrop-filter: blur(8px);
+        }
+
+        .cube::before {
+            transform: rotateY(0deg) translateZ(50px);
+        }
+
+        .cube::after {
+            transform: rotateY(90deg) translateZ(50px);
+        }
+
+        .cube div:nth-child(1) {
+            transform: rotateY(180deg) translateZ(50px);
+        }
+
+        .cube div:nth-child(2) {
+            transform: rotateX(90deg) translateZ(50px);
+        }
+
+        .cube div:nth-child(3) {
+            transform: rotateX(-90deg) translateZ(50px);
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotateX(0) rotateY(0);
+            }
+            to {
+                transform: rotateX(360deg) rotateY(360deg);
+            }
+        }
+
+        .loading-bar {
+            width: 200px; /* Lebar bar loading ditingkatkan */
+            height: 8px; /* Tinggi bar loading */
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            position: absolute;
+            top: 140px; /* Geser ke bawah */
+            left: 50%;
+            transform: translateX(-50%);
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+        }
+
+        .loading-fill {
+            width: 0;
+            height: 100%;
+            background: #00ffff; /* Mengubah warna latar belakang bar loading */
+            border-radius: 10px;
+            animation: loading 7s linear forwards; /* Mengatur durasi animasi menjadi 5 detik */
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.8), inset 0 0 10px rgba(0, 255, 255, 0.5); /* Efek glow di dalam */
+        }
+
+        @keyframes loading {
+            0% {
+                width: 0;
+            }
+            100% {
+                width: 100%;
+            }
+        }
+
+        .loading-text {
+            position: absolute;
+            top: 155px; /* Menyesuaikan posisi di bawah bar loading */
+            left: 50%;
+            transform: translateX(-50%);
+            color: #00ffff; /* Mengubah warna tulisan "LOADING" */
+            font-size: 15px; /* Ukuran font diperbarui menjadi 15px */
+            font-weight: 600; /* Menggunakan ketebalan font Poppins */
+            text-align: center;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8); /* Efek glow di sekitar teks */
+            animation: bounce 2s infinite; /* Animasi bouncing */
+            font-family: 'Poppins', sans-serif; /* Menggunakan font Poppins */
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0); /* Posisi awal dan akhir */
+            }
+            50% {
+                transform: translateX(-50%) translateY(-10px); /* Bergerak sedikit ke atas */
+            }
+        }
+
+        .ring {
+            width: 150px;
+            height: 150px;
+            border: 4px solid rgba(0, 255, 255, 0.5);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: rotateRing 3s linear infinite;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+        }
+
+        @keyframes rotateRing {
+            from {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            to {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.8);
+            animation: float 3s linear infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                transform: translateY(-30px) scale(1.2);
+            }
+            100% {
+                transform: translateY(0) scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loader">
+        <div class="cube">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <div class="ring"></div>
+        <div class="loading-bar">
+            <div class="loading-fill"></div>
+        </div>
+        <div class="loading-text">LOADING</div> <!-- Menambahkan tulisan "LOADING" -->
+    </div>
+
+    <script>
+        const numberOfParticles = 100;
+        const body = document.body;
+
+        for (let i = 0; i < numberOfParticles; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            const size = Math.random() * 4 + 2; // Ukuran partikel antara 2px dan 6px
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.top = `${Math.random() * 100}vh`;
+            particle.style.left = `${Math.random() * 100}vw`;
+            particle.style.opacity = Math.random();
+            particle.style.animationDuration = `${Math.random() * 2 + 1}s`;
+            body.appendChild(particle);
+        }
+
+        // Mengalihkan halaman setelah 5 detik
+        setTimeout(() => {
+            window.location.href = 'index1.html';
+        }, 7000); // 5000ms = 5 detik
+    </script>
+</body>
+</html>
